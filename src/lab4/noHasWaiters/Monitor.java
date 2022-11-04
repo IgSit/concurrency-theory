@@ -1,4 +1,4 @@
-package lab4;
+package lab4.noHasWaiters;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -6,6 +6,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
     private int bufferCount = 0;
+
+    private boolean isFirstConsumerWaiting = false;
+
+    private boolean isFirstProducerWaiting = false;
     private final int maxBuffer;
     private final Lock lock = new ReentrantLock();
 
@@ -26,13 +30,15 @@ public class Monitor {
         try {
             lock.lock();
 
-            while (!canProduce(production)) {
+            while (isFirstProducerWaiting) {
                 restProducerCond.await();
             }
             while (!canProduce(production)) {
+                isFirstProducerWaiting = true;
                 firstProducerCond.await();
             }
             bufferCount += production;
+            isFirstProducerWaiting = false;
             restProducerCond.signal();
             firstConsumerCond.signal();
         }
@@ -48,13 +54,15 @@ public class Monitor {
         try {
             lock.lock();
 
-            while (!canConsume(consumption)) {
+            while (isFirstConsumerWaiting) {
                 restConsumerCond.await();
             }
             while (!canConsume(consumption)) {
+                isFirstConsumerWaiting = true;
                 firstConsumerCond.await();
             }
             bufferCount -= consumption;
+            isFirstConsumerWaiting = false;
             restConsumerCond.signal();
             firstProducerCond.signal();
         }

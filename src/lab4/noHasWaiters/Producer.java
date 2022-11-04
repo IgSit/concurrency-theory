@@ -1,4 +1,4 @@
-package lab4;
+package lab4.noHasWaiters;
 
 public class Producer extends Thread{
     private final Monitor monitor;
@@ -23,7 +23,7 @@ public class Producer extends Thread{
             if (production > 1) System.out.print("I'm fat - ");
             System.out.println("Produced. Access no: " + monitorAccessCounter);
             try {
-                sleep(300);
+                sleep(30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-package lab4;
+package lab4.noHasWaiters;
 
 import java.util.ArrayList;
 import java.util.List;

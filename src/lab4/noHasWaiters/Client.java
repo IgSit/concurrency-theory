@@ -1,4 +1,4 @@
-package lab4;
+package lab4.noHasWaiters;
 
 public class Client extends Thread {
     private final Monitor monitor;
@@ -22,7 +22,7 @@ public class Client extends Thread {
             if (consumption > 1) System.out.print("I'm fat - ");
             System.out.println("Consumed. Access no: " + monitorAccessCounter);
             try {
-                sleep(300);
+                sleep(30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
