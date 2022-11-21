@@ -29,14 +29,14 @@ public class Monitor {
         }
     }
 
-    public void produce(int consumption) {
+    public void produce(int production) {
         producerLock.lock();
         innerLock.lock();
         try {
-            while (!canProduce(consumption)) {
+            while (!canProduce(production)) {
                 condition.await();
             }
-            bufferCount += consumption;
+            bufferCount += production;
             condition.signal();
         } catch (InterruptedException e) {
             e.printStackTrace();
