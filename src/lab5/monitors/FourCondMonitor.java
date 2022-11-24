@@ -6,19 +6,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class FourCondMonitor extends AbstractMonitor{
     private int bufferCount = 0;
-
     private boolean isFirstConsumerWaiting = false;
-
     private boolean isFirstProducerWaiting = false;
     private final int maxBuffer;
     private final Lock lock = new ReentrantLock();
 
     private final Condition firstProducerCond = lock.newCondition();
-
     private final Condition restProducerCond = lock.newCondition();
-
     private final Condition firstConsumerCond = lock.newCondition();
-
     private final Condition restConsumerCond = lock.newCondition();
 
 
@@ -74,6 +69,11 @@ public class FourCondMonitor extends AbstractMonitor{
         finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "FourCondMonitor";
     }
 
     private boolean canProduce(int production) {

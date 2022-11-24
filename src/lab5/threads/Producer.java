@@ -1,9 +1,8 @@
 package lab5.threads;
 
-
 import lab5.monitors.AbstractMonitor;
 
-public class Producer extends Thread{
+public class Producer extends AbstractThread{
     private final AbstractMonitor monitor;
     private final int production;
     private int monitorAccessCounter = 0;
@@ -16,15 +15,15 @@ public class Producer extends Thread{
 
     @Override
     public void run() {
-        for (;;) {
+        running.set(true);
+        while (running.get()){
             monitor.produce(production);
             monitorAccessCounter += 1;
-            if (production > 1) System.out.print("I'm fat - ");
             System.out.println("Produced. Access no: " + monitorAccessCounter);
             try {
                 sleep(10);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                this.interrupt();
             }
         }
     }

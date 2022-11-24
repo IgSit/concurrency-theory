@@ -52,6 +52,11 @@ public class ThreeLockMonitor extends AbstractMonitor {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ThreeLockMonitor";
+    }
+
     private boolean canProduce(int production) {
         return bufferCount + production <= maxBuffer;
     }
