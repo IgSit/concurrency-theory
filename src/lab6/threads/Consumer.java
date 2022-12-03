@@ -1,17 +1,24 @@
-package lab6;
+package lab6.threads;
+
+import lab6.util.Computations;
+import lab6.util.FutureResult;
+import lab6.Scheduler;
+import lab6.util.Task;
 
 import java.util.Random;
 
 public class Consumer extends Thread{
+    private final Computations computations;
     private final int maxChange;
     private final Random random;
     private final Scheduler scheduler;
     private boolean running;
     private long taskCounter;
 
-    public Consumer(int maxChange, Scheduler scheduler) {
-        this.random = new Random();
+    public Consumer(int iterations, int maxChange, Scheduler scheduler) {
+        this.computations = new Computations(iterations);
         this.maxChange = maxChange;
+        this.random = new Random();
         this.scheduler = scheduler;
         this.taskCounter = 0;
     }
@@ -21,22 +28,22 @@ public class Consumer extends Thread{
         running = true;
         while (running) {
             int consumption = -getRandomLength();
-            Task task = new Task(consumption);
-            FutureResult<Long> futureResult = scheduler.enqueue(task);
+            Task task = new Task(consumption, new FutureResult<>());
+            scheduler.enqueue(task);
 
-            performAsyncComputations(futureResult);
+            performAsyncComputations(task.getFutureResult());
         }
     }
 
     private void performAsyncComputations(FutureResult<Long> futureResult) {
         while (running && !futureResult.isDone()) {
-            Computations.compute();
+            computations.compute();
             taskCounter += 1;
         }
     }
 
     private int getRandomLength() {
-        return random.nextInt(1, maxChange + 1);
+        return random.nextInt(maxChange + 1);
     }
 
     public void stopThread() {
