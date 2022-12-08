@@ -43,5 +43,13 @@ public class Main {
             producers.get(i).join();
         }
         scheduler.join();
+
+        long totalComputations = scheduler.getTotalComputations();
+        for (int i = 0; i < THREAD_TYPE_AMOUNT; i++) {
+            totalComputations += consumers.get(i).getTotalComputations();
+            totalComputations += producers.get(i).getTotalComputations();
+        }
+
+        System.out.println(totalComputations);
     }
 }

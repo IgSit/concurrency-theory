@@ -8,19 +8,22 @@ import lab6.util.Task;
 import java.util.Random;
 
 public class Consumer extends Thread{
+
+    private final int iterations;
+    private int totalComputations = 0;
+
     private final Computations computations;
     private final int maxChange;
     private final Random random;
     private final Scheduler scheduler;
     private boolean running;
-    private long taskCounter;
 
     public Consumer(int iterations, int maxChange, Scheduler scheduler) {
+        this.iterations = iterations;
         this.computations = new Computations(iterations);
         this.maxChange = maxChange;
         this.random = new Random();
         this.scheduler = scheduler;
-        this.taskCounter = 0;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class Consumer extends Thread{
     private void performAsyncComputations(FutureResult<Long> futureResult) {
         while (running && !futureResult.isDone()) {
             computations.compute();
-            taskCounter += 1;
+            totalComputations += iterations;
         }
     }
 
@@ -48,9 +51,10 @@ public class Consumer extends Thread{
 
     public void stopThread() {
         this.running = false;
+        this.interrupt();
     }
 
-    public long getTaskCounter() {
-        return taskCounter;
+    public int getTotalComputations() {
+        return totalComputations;
     }
 }

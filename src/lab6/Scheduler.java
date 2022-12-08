@@ -13,6 +13,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Scheduler extends Thread {
 
+    private final int iterations;
+    private int totalComputations = 0;
+
     private final Computations computations;
     private final ReentrantLock lock;
     private long buffer;
@@ -23,6 +26,7 @@ public class Scheduler extends Thread {
     private boolean running;
 
     public Scheduler(int iterations, long maxBufferSize) {
+        this.iterations = iterations;
         this.computations = new Computations(iterations);
         this.lock = new ReentrantLock();
         this.buffer = 0;
@@ -33,7 +37,7 @@ public class Scheduler extends Thread {
     }
 
     public void enqueue(Task task) {
-
+        incomingRequests.add(task);
     }
 
     @Override
@@ -46,6 +50,11 @@ public class Scheduler extends Thread {
 
     public void stopThread() {
         this.running = false;
+        this.interrupt();
+    }
+
+    public int getTotalComputations() {
+        return totalComputations;
     }
 
     private void doPresentTask() {
@@ -58,6 +67,7 @@ public class Scheduler extends Thread {
          Optional<Task> optionalTask = getTask();
          if (optionalTask.isPresent()) {
              computations.compute();
+             totalComputations += iterations;
              Task task = optionalTask.get();
              buffer += task.getChange();
              FutureResult<Long> result = task.getFutureResult();
