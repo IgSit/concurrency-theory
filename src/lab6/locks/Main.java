@@ -35,12 +35,10 @@ public class Main {
                 SCHEDULER_ITERATIONS = schedulerSize;
                 CLIENT_ITERATIONS = threadSize;
                 int reps = 5;
-                long total = 0;
                 for (int i = 0; i < reps; i++) {
-                    total += getSingleResult() / reps;
+                    String totalChange = String.valueOf(getSingleResult());
+                    writer.write(getDataRow(totalChange));
                 }
-                String totalChange = String.valueOf(total);
-                writer.write(getDataRow(totalChange));
             }
         }
         writer.close();
