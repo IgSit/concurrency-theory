@@ -1,16 +1,15 @@
-package lab6.threads;
+package lab6.ao.threads;
 
-import lab6.util.Computations;
-import lab6.util.FutureResult;
-import lab6.Scheduler;
-import lab6.util.Task;
+import lab6.ao.util.Computations;
+import lab6.ao.util.FutureResult;
+import lab6.ao.util.Task;
 
 import java.util.Random;
 
 public class Consumer extends Thread{
 
     private final int iterations;
-    private int totalComputations = 0;
+    private long totalComputations = 0;
 
     private final Computations computations;
     private final int maxChange;
@@ -41,7 +40,7 @@ public class Consumer extends Thread{
     private void performAsyncComputations(FutureResult<Long> futureResult) {
         while (running && !futureResult.isDone()) {
             computations.compute();
-            totalComputations += iterations;
+            totalComputations += iterations / 50;
         }
     }
 
@@ -54,7 +53,7 @@ public class Consumer extends Thread{
         this.interrupt();
     }
 
-    public int getTotalComputations() {
+    public long getTotalComputations() {
         return totalComputations;
     }
 }

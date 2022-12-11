@@ -1,8 +1,8 @@
-package lab6;
+package lab6.ao.threads;
 
-import lab6.util.Computations;
-import lab6.util.FutureResult;
-import lab6.util.Task;
+import lab6.ao.util.Computations;
+import lab6.ao.util.FutureResult;
+import lab6.ao.util.Task;
 
 import java.util.ArrayDeque;
 import java.util.Optional;
@@ -14,8 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Scheduler extends Thread {
 
     private final int iterations;
-    private int totalComputations = 0;
-
+    private long totalComputations = 0;
     private final Computations computations;
     private final ReentrantLock lock;
     private long buffer;
@@ -53,7 +52,7 @@ public class Scheduler extends Thread {
         this.interrupt();
     }
 
-    public int getTotalComputations() {
+    public long getTotalComputations() {
         return totalComputations;
     }
 
@@ -67,7 +66,7 @@ public class Scheduler extends Thread {
          Optional<Task> optionalTask = getTask();
          if (optionalTask.isPresent()) {
              computations.compute();
-             totalComputations += iterations;
+             totalComputations += iterations / 50;
              Task task = optionalTask.get();
              buffer += task.getChange();
              FutureResult<Long> result = task.getFutureResult();

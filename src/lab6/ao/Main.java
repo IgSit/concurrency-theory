@@ -1,8 +1,8 @@
-package lab6;
+package lab6.ao;
 
-import lab5.monitors.AbstractMonitor;
-import lab6.threads.Consumer;
-import lab6.threads.Producer;
+import lab6.ao.threads.Consumer;
+import lab6.ao.threads.Producer;
+import lab6.ao.threads.Scheduler;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,54 +13,58 @@ import java.util.StringJoiner;
 
 public class Main {
 
-    private static final int CLIENT_ITERATIONS = 100;
-    private static final int SCHEDULER_ITERATIONS = 100;
+    private static int CLIENT_ITERATIONS = 100;
+    private static int SCHEDULER_ITERATIONS = 100;
     private static final int THREAD_TYPE_AMOUNT = 10;
     private static final int BUFFER_SIZE = 100;
     private static final int MAX_CHANGE = BUFFER_SIZE / 3;
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        String filename = "data.csv";
+        String filename = "ao.csv";
         File file = new File(filename);
         file.createNewFile();
         FileWriter writer = new FileWriter(filename);
         writeHeader(writer);
 
-        for (int threadAmount: threadAmounts) {
-            for (AbstractMonitor monitor: monitors) {
-                for (int i = 0; i < repetitions; i++) {
-                    String dataRow = getDataRow();
-                    writer.write(dataRow);
+        List<Integer> sizes = List.of(50, 250, 500, 1000, 2000);
+
+        for (int schedulerSize: sizes) {
+            for (int threadSize : sizes) {
+                SCHEDULER_ITERATIONS = schedulerSize;
+                CLIENT_ITERATIONS = threadSize;
+                int reps = 5;
+                long total = 0;
+                for (int i = 0; i < reps; i++) {
+                    total += getSingleResult() / reps;
                 }
+                String totalChange = String.valueOf(total);
+                writer.write(getDataRow(totalChange));
             }
         }
-        List<Integer> sizes = List.of(5, 25, 50, 100);
         writer.close();
     }
 
     private static void writeHeader(FileWriter writer) throws IOException {
         StringJoiner titleJoiner = new StringJoiner(",");
-        titleJoiner.
-                add("Monitor").
-                add("ThreadTypeAmount").
-                add("TotalChange\n");
+        titleJoiner
+            .add("Monitor")
+            .add("ClientIterations")
+            .add("SchedulerIterations")
+            .add("TotalChange\n");
         writer.write(titleJoiner.toString());
     }
 
-    private static String getDataRow() throws InterruptedException {
+    private static String getDataRow(String totalChange) {
         StringJoiner joiner = new StringJoiner(",");
-        String totalChange = String.valueOf(
-                getSingleResult()
-        );
-        joiner.
-                add("Active Object").
-                add(String.valueOf(CLIENT_ITERATIONS)).
-                add(String.valueOf(SCHEDULER_ITERATIONS)).
-                add(totalChange + "\n");
+        joiner
+            .add("ActiveObject")
+            .add(String.valueOf(CLIENT_ITERATIONS))
+            .add(String.valueOf(SCHEDULER_ITERATIONS))
+            .add(totalChange + "\n");
         return joiner.toString();
     }
 
-    private static int getSingleResult() throws InterruptedException {
+    private static long getSingleResult() throws InterruptedException {
 
         Scheduler scheduler = new Scheduler(SCHEDULER_ITERATIONS, BUFFER_SIZE);
         List<Consumer> consumers = new ArrayList<>();
@@ -77,7 +81,7 @@ public class Main {
             consumers.get(i).start();
         }
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         for (int i = 0; i < THREAD_TYPE_AMOUNT; i++) {
             producers.get(i).stopThread();
@@ -91,7 +95,7 @@ public class Main {
         }
         scheduler.join();
 
-        int totalComputations = scheduler.getTotalComputations();
+        long totalComputations = scheduler.getTotalComputations();
         for (int i = 0; i < THREAD_TYPE_AMOUNT; i++) {
             totalComputations += consumers.get(i).getTotalComputations();
             totalComputations += producers.get(i).getTotalComputations();

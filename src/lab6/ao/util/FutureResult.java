@@ -1,4 +1,4 @@
-package lab6.util;
+package lab6.ao.util;
 
 public class FutureResult<T> {
     private volatile T result = null;

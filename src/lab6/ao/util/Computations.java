@@ -1,4 +1,4 @@
-package lab6.util;
+package lab6.ao.util;
 
 public final class Computations {
     private final int iterations;
