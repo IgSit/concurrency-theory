@@ -13,12 +13,14 @@ public class Buffer implements CSProcess {
     private final int bufferCapacity;
     private int bufferValue;
     private boolean running;
+    private final int id;
 
     public Buffer(
             One2OneChannelInt[] producers,
             One2OneChannelInt[] consumeRequests,
             One2OneChannelInt[] consumers,
-            int bufferCapacity) {
+            int bufferCapacity,
+            int id) {
         assert consumers.length == consumeRequests.length;
 
         this.producers = producers;
@@ -26,6 +28,7 @@ public class Buffer implements CSProcess {
         this.consumers = consumers;
         this.bufferCapacity = bufferCapacity;
         this.bufferValue = 0;
+        this.id = id;
     }
 
     @Override
@@ -35,32 +38,33 @@ public class Buffer implements CSProcess {
         final Alternative alternative = new Alternative(guards);
 
         while (running) {
-            System.out.printf("Buffer: current value: %d\n", bufferValue);
+            System.out.printf("Buffer %d: current value: %d\n", id, bufferValue);
             int index = alternative.fairSelect();
             if (isProducer(index)) {
                 if (bufferValue < bufferCapacity) {
-                    producers[index].out().write(1);
                     int production = producers[index].in().read();
+                    producers[index].out().write(1);
                     assert production == 1;
                     bufferValue += production;
-                    System.out.println("Buffer: Accepted producer");
+                    System.out.printf("Buffer %d: Accepted producer %d\n", id, index);
                 }
                 else {
                     producers[index].out().write(0);
-                    System.out.println("Buffer: rejected producer");
+                    System.out.printf("Buffer %d: rejected producer %d\n", id, index);
                 }
             }
             else {
+                index -= producers.length;
                 if (bufferValue > 0) {
-                    consumers[index].out().write(1);
                     int consumption = consumeRequests[index].in().read();
+                    consumers[index].out().write(1);
                     assert consumption == 1;
                     bufferValue -= consumption;
-                    System.out.println("Buffer: accepted consumer");
+                    System.out.printf("Buffer %d: Accepted consumer %d\n", id, index);
                 }
                 else {
                     consumers[index].out().write(0);
-                    System.out.println("Buffer: rejected consumer");
+                    System.out.printf("Buffer %d: Rejected consumer %d\n", id, index);
                 }
             }
         }
