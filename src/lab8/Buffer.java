@@ -14,6 +14,7 @@ public class Buffer implements CSProcess {
     private int bufferValue;
     private boolean running;
     private final int id;
+    private int accessCounter;
 
     public Buffer(
             One2OneChannelInt[] producers,
@@ -29,6 +30,7 @@ public class Buffer implements CSProcess {
         this.bufferCapacity = bufferCapacity;
         this.bufferValue = 0;
         this.id = id;
+        accessCounter = 0;
     }
 
     @Override
@@ -38,11 +40,12 @@ public class Buffer implements CSProcess {
         final Alternative alternative = new Alternative(guards);
 
         while (running) {
-            System.out.printf("Buffer %d: current value: %d\n", id, bufferValue);
+            System.out.printf("Buffer %d: current value: %d, accessed: %d\n", id, bufferValue, accessCounter);
             int index = alternative.fairSelect();
             if (isProducer(index)) {
                 if (bufferValue < bufferCapacity) {
                     int production = producers[index].in().read();
+                    accessCounter += 1;
                     producers[index].out().write(1);
                     assert production == 1;
                     bufferValue += production;
@@ -57,6 +60,7 @@ public class Buffer implements CSProcess {
                 index -= producers.length;
                 if (bufferValue > 0) {
                     int consumption = consumeRequests[index].in().read();
+                    accessCounter += 1;
                     consumers[index].out().write(1);
                     assert consumption == 1;
                     bufferValue -= consumption;
