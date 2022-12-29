@@ -3,12 +3,12 @@ package lab8;
 import org.jcsp.lang.CSProcess;
 import org.jcsp.lang.One2OneChannelInt;
 
-import java.util.random.RandomGenerator;
+import java.util.Random;
 
 public class Consumer implements CSProcess {
     private final One2OneChannelInt[] consumeRequests;
     private final One2OneChannelInt[] buffers;
-    private final RandomGenerator subscription;
+    private final Random subscription;
     private boolean running;
     private final int id;
 

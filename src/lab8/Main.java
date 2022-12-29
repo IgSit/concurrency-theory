@@ -69,5 +69,20 @@ public class Main {
 
         Parallel parallel = new Parallel(processes);
         parallel.run();
+
+        Thread.sleep(1000);
+
+        parallel.removeAllProcesses();
+        parallel.releaseAllThreads();
+
+        for (int i = 0; i < PRODUCERS; i++) {
+            producers[i].stop();
+        }
+        for (int i = 0; i < CONSUMERS; i++) {
+            consumers[i].stop();
+        }
+        for (int i = 0; i < BUFFERS; i++) {
+            buffers[i].stop();
+        }
     }
 }

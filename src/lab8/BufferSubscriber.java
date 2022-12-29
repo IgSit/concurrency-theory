@@ -1,14 +1,13 @@
 package lab8;
 
 import java.util.Random;
-import java.util.random.RandomGenerator;
 
 public class BufferSubscriber {
 
     public BufferSubscriber() {
     }
 
-    public RandomGenerator getBufferSubscription() {
+    public Random getBufferSubscription() {
         return new Random();
     }
 }
